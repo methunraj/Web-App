@@ -46,6 +46,10 @@ export function AIGenerationTab() {
     arePromptsGenerated,
     savedSchemas,
     savedPromptSets,
+    loadSchema,
+    loadPromptSet,
+    completeConfigurations,
+    loadCompleteConfiguration,
     saveCompleteConfiguration,
     resetConfiguration,
   } = useConfiguration();
@@ -284,7 +288,7 @@ export function AIGenerationTab() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Select>
+                <Select onValueChange={(id) => loadSchema(id)}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Load saved schema" />
                   </SelectTrigger>
@@ -375,6 +379,20 @@ export function AIGenerationTab() {
                     </div>
                   )}
                 </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <Select onValueChange={(id) => loadPromptSet(id)}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Load saved prompts" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {savedPromptSets.map((promptSet) => (
+                        <SelectItem key={promptSet.id} value={promptSet.id}>
+                          {promptSet.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -402,17 +420,21 @@ export function AIGenerationTab() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <Select onValueChange={(id) => loadCompleteConfiguration(id)}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Load configuration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {completeConfigurations.map((config) => (
+                        <SelectItem key={config.id} value={config.id}>
+                          {config.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button variant="outline" onClick={handleReset}>
                     <RotateCcw className="mr-2 h-4 w-4" />
                     Reset All
-                  </Button>
-                  <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export Config
-                  </Button>
-                  <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import Config
                   </Button>
                 </div>
               </CardContent>
