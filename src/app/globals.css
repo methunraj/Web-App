@@ -4,80 +4,100 @@
 
 @layer base {
   :root {
-    --background: 0 0% 97%; /* #F7F7F7 (Off-white) */
-    --foreground: 210 10% 23%; /* #343A40 (Dark Gray-Blue) */
-    --card: 0 0% 100%; /* #FFFFFF (White) */
-    --card-foreground: 210 10% 23%;
+    /* Modern Enhanced Color Palette */
+    --background: 0 0% 98%; /* #FAFAFA (Softer white) */
+    --foreground: 222 84% 4.9%; /* #020817 (Rich dark) */
+    --card: 0 0% 100%; /* #FFFFFF (Pure white) */
+    --card-foreground: 222 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 23%;
-    --primary: 210 13% 47%; /* #708090 (Slate Gray) */
-    --primary-foreground: 0 0% 98%; /* #FAFAFA (Almost White) */
-    --secondary: 210 15% 90%; /* #E0E4E8 (Very Light Blue-Gray) */
-    --secondary-foreground: 210 10% 30%; /* #414F5C (Darker Slate Gray) */
-    --muted: 210 15% 94%; /* #EEF1F3 (Even Lighter Blue-Gray for muted backgrounds) */
-    --muted-foreground: 210 10% 45%; /* #646F79 (Medium Gray-Blue) */
-    --accent: 180 100% 25.1%; /* #008080 (Teal) */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF (White) */
-    --destructive: 0 72% 51%; /* #E53E3E (Red) */
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 88%; /* #D7DDE2 (Light Gray Border) */
-    --input: 210 10% 88%;
-    --ring: 180 90% 35%; /* #0A7777 (Slightly desaturated Teal for focus) */
-    --radius: 0.5rem;
+    --popover-foreground: 222 84% 4.9%;
+    --primary: 221 83% 53%; /* #3B82F6 (Modern blue) */
+    --primary-foreground: 210 40% 98%; /* #F8FAFC (Almost white) */
+    --secondary: 210 40% 96%; /* #F1F5F9 (Light gray) */
+    --secondary-foreground: 222 84% 4.9%;
+    --muted: 210 40% 96%; /* #F1F5F9 (Consistent with secondary) */
+    --muted-foreground: 215 16% 47%; /* #64748B (Medium gray) */
+    --accent: 142 76% 36%; /* #10B981 (Vibrant emerald) */
+    --accent-foreground: 355 7% 97%; /* #FEFEFE (White) */
+    --destructive: 0 84% 60%; /* #EF4444 (Modern red) */
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%; /* #E2E8F0 (Subtle border) */
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%; /* Match primary for focus */
+    --radius: 0.75rem; /* Slightly more rounded */
 
-    /* Sidebar specific colors - Light Theme */
-    --sidebar-background: 210 10% 16%; /* #22272C (Dark for contrast) */
-    --sidebar-foreground: 0 0% 97%; /* Off-white (text on sidebar) */
-    --sidebar-primary: 180 100% 25.1%; /* Teal (for active/hover states in sidebar) */
-    --sidebar-primary-foreground: 0 0% 100%; /* White (text on teal primary in sidebar) */
-    --sidebar-accent: 210 10% 23%; /* #343A40 (Slightly lighter dark for hover) */
-    --sidebar-accent-foreground: 0 0% 97%; /* Off-white text */
-    --sidebar-border: 210 10% 23%;
-    --sidebar-ring: 180 90% 35%;
+    /* Enhanced Sidebar Colors - Light Theme */
+    --sidebar-background: 222 84% 4.9%; /* #020817 (Rich dark) */
+    --sidebar-foreground: 210 40% 98%; /* #F8FAFC (Light text) */
+    --sidebar-primary: 142 76% 36%; /* #10B981 (Emerald accent) */
+    --sidebar-primary-foreground: 355 7% 97%;
+    --sidebar-accent: 217 32% 17%; /* #1E293B (Hover state) */
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 32% 17%;
+    --sidebar-ring: 142 76% 36%;
 
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* Enhanced Chart Colors */
+    --chart-1: 221 83% 53%; /* Primary blue */
+    --chart-2: 142 76% 36%; /* Emerald */
+    --chart-3: 262 83% 58%; /* Purple */
+    --chart-4: 43 96% 56%; /* Amber */
+    --chart-5: 0 84% 60%; /* Red */
+
+    /* Success, Warning, Info Colors */
+    --success: 142 76% 36%; /* #10B981 (Emerald) */
+    --success-foreground: 355 7% 97%;
+    --warning: 43 96% 56%; /* #F59E0B (Amber) */
+    --warning-foreground: 222 84% 4.9%;
+    --info: 199 89% 48%; /* #0EA5E9 (Sky blue) */
+    --info-foreground: 210 40% 98%;
   }
 
   .dark {
-    --background: 210 10% 12%; /* #1A1D21 (Very Dark Blue-Gray) */
-    --foreground: 210 15% 88%; /* #DDE1E3 (Light Gray) */
-    --card: 210 10% 16%; /* #22272C (Darker Card) */
-    --card-foreground: 210 15% 88%;
-    --popover: 210 10% 10%; /* #14171A (Even Darker Popover) */
-    --popover-foreground: 210 15% 88%;
-    --primary: 180 80% 45%; /* #14B8A6 (Vibrant Teal) */
-    --primary-foreground: 210 10% 12%; /* #1A1D21 (Dark text on Teal) */
-    --secondary: 210 10% 20%; /* #2B3036 (Medium-Dark Blue-Gray) */
-    --secondary-foreground: 210 15% 80%; /* #C4C9CC (Lighter Gray) */
-    --muted: 210 10% 20%;
-    --muted-foreground: 210 15% 60%; /* #8D9499 (Medium-Light Gray) */
-    --accent: 210 13% 47%; /* #708090 (Slate Gray) */
-    --accent-foreground: 210 15% 95%; /* #F0F2F3 (Very Light Gray text on Slate Gray) */
-    --destructive: 0 60% 50%; /* #CC3333 (Desaturated Red) */
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 25%; /* #373C40 (Dark Gray Border) */
-    --input: 210 10% 25%;
-    --ring: 180 80% 55%; /* #2DD4BF (Brighter Teal for focus) */
+    /* Modern Enhanced Dark Mode Palette */
+    --background: 222 84% 4.9%; /* #020817 (Rich dark) */
+    --foreground: 210 40% 98%; /* #F8FAFC (Light text) */
+    --card: 222 84% 4.9%; /* #020817 (Match background) */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%; /* #3B82F6 (Brighter blue for dark) */
+    --primary-foreground: 222 84% 4.9%; /* Dark text on blue */
+    --secondary: 217 32% 17%; /* #1E293B (Dark secondary) */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 32% 17%; /* #1E293B (Consistent with secondary) */
+    --muted-foreground: 215 20% 65%; /* #94A3B8 (Medium light gray) */
+    --accent: 142 76% 36%; /* #10B981 (Keep emerald consistent) */
+    --accent-foreground: 355 7% 97%;
+    --destructive: 0 84% 60%; /* #EF4444 (Consistent red) */
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%; /* #1E293B (Dark border) */
+    --input: 217 32% 17%;
+    --ring: 217 91% 60%; /* Match primary for focus */
     
-    /* Sidebar specific colors - Dark Theme */
-    --sidebar-background: 210 10% 10%; /* #14171A (Even darker than main background) */
-    --sidebar-foreground: 210 15% 80%; /* #C4C9CC (Lighter Gray for text) */
-    --sidebar-primary: 180 80% 45%; /* Vibrant Teal */
-    --sidebar-primary-foreground: 210 10% 12%; /* Dark text */
-    --sidebar-accent: 210 10% 15%; /* Slightly lighter than sidebar bg for hover */
-    --sidebar-accent-foreground: 210 15% 88%; /* Light gray text */
-    --sidebar-border: 210 10% 15%;
-    --sidebar-ring: 180 80% 55%;
+    /* Enhanced Sidebar Colors - Dark Theme */
+    --sidebar-background: 222 84% 4.9%; /* #020817 (Match main background) */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 142 76% 36%; /* #10B981 (Emerald accent) */
+    --sidebar-primary-foreground: 355 7% 97%;
+    --sidebar-accent: 217 32% 17%; /* #1E293B (Hover state) */
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 32% 17%;
+    --sidebar-ring: 142 76% 36%;
 
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Enhanced Chart Colors - Dark Mode */
+    --chart-1: 217 91% 60%; /* Bright blue */
+    --chart-2: 142 76% 36%; /* Emerald */
+    --chart-3: 262 83% 58%; /* Purple */
+    --chart-4: 43 96% 56%; /* Amber */
+    --chart-5: 0 84% 60%; /* Red */
+
+    /* Success, Warning, Info Colors - Dark Mode */
+    --success: 142 76% 36%; /* #10B981 (Emerald) */
+    --success-foreground: 355 7% 97%;
+    --warning: 43 96% 56%; /* #F59E0B (Amber) */
+    --warning-foreground: 222 84% 4.9%;
+    --info: 199 89% 48%; /* #0EA5E9 (Sky blue) */
+    --info-foreground: 210 40% 98%;
   }
 }
 
@@ -91,11 +111,169 @@
 }
 
 @layer utilities {
-  .animate-fadeIn {
-    animation: fadeIn 0.7s ease-in-out;
+  /* Enhanced Animation Foundations */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  /* Animation Classes */
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-from-left 0.4s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-from-right 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--muted)) 50%,
+      transparent
+    );
+    background-size: 200px 100%;
+  }
+
+  /* Transition Utilities */
+  .transition-all-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-colors-smooth {
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  }
+
+  .transition-transform-smooth {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Focus States */
+  .focus-ring-modern {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Loading States */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  .loading-shimmer {
+    @apply animate-shimmer bg-muted rounded overflow-hidden;
   }
 }
