@@ -674,7 +674,7 @@ export function AIGenerationTab() {
                 </Accordion>
               </div>
 
-              <div class="space-y-4 pt-4">
+              <div className="space-y-4 pt-4">
                 <Separator />
                 <div className="space-y-2">
                   <Label htmlFor="config-name">Configuration Name</Label>
