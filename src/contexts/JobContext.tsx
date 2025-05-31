@@ -23,6 +23,10 @@ interface JobContextType {
   thinkingDetailLevel: ThinkingDetailLevel;
   setThinkingDetailLevel: Dispatch<SetStateAction<ThinkingDetailLevel>>;
 
+  // Agno AI processing
+  useAgnoProcessing: boolean;
+  setUseAgnoProcessing: Dispatch<SetStateAction<boolean>>;
+
   progress: number; 
   currentTask: string;
   
@@ -53,7 +57,8 @@ interface JobContextType {
     model: string,
     llmApiKey: string, 
     llmNumericThinkingBudget: number | undefined,
-    llmTemperature: number
+    llmTemperature: number,
+    useAgnoProcessing?: boolean
   ) => void;
   cancelProcessingJobQueue: () => void;
 }
@@ -84,6 +89,7 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
   const [isProcessingQueue, setIsProcessingQueue] = useState<boolean>(false);
   const [thinkingEnabled, setThinkingEnabled] = useState<boolean>(false);
   const [thinkingDetailLevel, setThinkingDetailLevel] = useState<ThinkingDetailLevel>(getInitialThinkingDetailLevel());
+  const [useAgnoProcessing, setUseAgnoProcessing] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [currentTask, setCurrentTask] = useState<string>('');
   
@@ -232,13 +238,15 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
     model: string,
     llmApiKey: string,
     llmNumericThinkingBudget: number | undefined,
-    llmTemperature: number
+    llmTemperature: number,
+    useAgnoProcessing: boolean = false
   ) => {
     console.log("Provider:", llmProvider);
     console.log("Model:", model);
     console.log("Max Retries:", maxRetriesPerFile);
     console.log("Thinking Enabled:", thinkingEnabled);
     console.log("Thinking Detail Level:", thinkingDetailLevel);
+    console.log("Agno Processing Enabled:", useAgnoProcessing);
     console.log("Caching Enabled:", useCaching);
     console.log("Cache Price Per Million Tokens:", `$${cachePricePerMillionTokens.toFixed(2)}`);
     console.log("Schema Length:", schemaJson.length);
@@ -314,6 +322,18 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
         
         setCurrentTask(`Extracting data from ${fileJob.name}...`);
         const extractionOutput = await extractData(extractionInput);
+        
+        console.log(`\n=== EXTRACTION OUTPUT DEBUG ===`);
+        console.log(`File: ${fileJob.name}`);
+        console.log(`extractionOutput exists: ${!!extractionOutput}`);
+        console.log(`extractedJson exists: ${!!extractionOutput?.extractedJson}`);
+        console.log(`extractedJson type: ${typeof extractionOutput?.extractedJson}`);
+        console.log(`extractedJson length: ${extractionOutput?.extractedJson?.length || 0}`);
+        if (extractionOutput?.extractedJson) {
+          console.log(`First 100 chars: ${extractionOutput.extractedJson.substring(0, 100)}...`);
+        }
+        console.log(`==============================\n`);
+        
         extractedDataJson = extractionOutput.extractedJson;
         tokens = {
           promptTokens: extractionOutput.promptTokens,
@@ -386,6 +406,75 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
             finalThinkingProcess = accumulatedThinkingForFile + errorText;
           }
         }
+        
+        // Agno AI Processing (if enabled and extraction was successful)
+        console.log(`\n=== AGNO PROCESSING CHECK ===`);
+        console.log(`useAgnoProcessing: ${useAgnoProcessing}`);
+        console.log(`extractedDataJson: ${extractedDataJson ? 'Has data' : 'NULL/UNDEFINED'}`);
+        console.log(`extractedDataJson length: ${extractedDataJson?.length || 0}`);
+        console.log(`============================\n`);
+        
+        if (useAgnoProcessing && extractedDataJson) {
+          try {
+            setCurrentTask(`Enhancing data with Agno AI for ${fileJob.name}...`);
+            
+            const agnoResponse = await fetch('/api/agno-process', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                extractedData: extractedDataJson,
+                fileName: fileJob.name,
+                llmProvider: llmProvider,
+                model: model,
+                apiKey: llmApiKey,
+                temperature: llmTemperature
+              }),
+            });
+            
+            if (agnoResponse.ok) {
+              const agnoResult = await agnoResponse.json();
+              if (agnoResult.success && agnoResult.download_url) {
+                // Add Agno token usage to existing tokens
+                if (agnoResult.token_usage) {
+                  tokens.agnoTokens = agnoResult.token_usage;
+                  tokens.agnoProcessingCost = agnoResult.processingCost;
+                }
+                
+                // Trigger automatic download of the enhanced XLSX file
+                const link = document.createElement('a');
+                link.href = agnoResult.download_url;
+                link.download = agnoResult.file_name || `enhanced_${fileJob.name}.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log(`\n=== AGNO PROCESSING RESULTS ===`);
+                console.log(`File: ${fileJob.name}`);
+                console.log(`Enhancement: Successful - XLSX file downloaded`);
+                console.log(`Download URL: ${agnoResult.download_url}`);
+                console.log(`File Name: ${agnoResult.file_name}`);
+                if (agnoResult.token_usage) {
+                  console.log(`Agno Input Tokens: ${agnoResult.token_usage.input_tokens || 'N/A'}`);
+                  console.log(`Agno Output Tokens: ${agnoResult.token_usage.output_tokens || 'N/A'}`);
+                  console.log(`Agno Total Tokens: ${agnoResult.token_usage.total_tokens || 'N/A'}`);
+                  console.log(`Agno Processing Cost: $${agnoResult.processingCost || 'N/A'}`);
+                }
+                console.log(`===============================\n`);
+                
+                // Note: The Python backend automatically cleans up files after 1 hour
+                // No manual cleanup needed
+              }
+            } else {
+              console.warn(`Agno processing failed for ${fileJob.name}:`, await agnoResponse.text());
+            }
+          } catch (agnoError) {
+            console.error(`Agno processing error for ${fileJob.name}:`, agnoError);
+            // Continue with original extracted data if Agno processing fails
+          }
+        }
+        
         jobStatus = 'success';
         filesSuccessfullyProcessedCount++;
         setProcessedFilesCount(prev => prev +1);
@@ -393,6 +482,20 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         console.error(`Error processing ${fileJob.name}:`, err);
         errorMsg = err instanceof Error ? err.message : "An unknown error occurred during extraction.";
+        
+        // If it's a JSON parsing error, add more context
+        if (errorMsg.includes('LLM output is not valid JSON')) {
+          console.error('\n=== JSON EXTRACTION ERROR ===');
+          console.error('The LLM generated invalid JSON. This often happens when:');
+          console.error('1. The document contains special characters that weren\'t properly escaped');
+          console.error('2. The schema is too complex for the model to follow perfectly');
+          console.error('3. The document has formatting that confuses the model');
+          console.error('\nSuggestions:');
+          console.error('- Try using a more capable model (e.g., gemini-2.5-pro)');
+          console.error('- Simplify the schema if possible');
+          console.error('- Enable retry (it often works on second attempt)');
+          console.error('============================\n');
+        }
         
         if (fileJob.retryCount < maxRetriesPerFile && !isCancelled) {
           jobStatus = 'retrying';
@@ -418,6 +521,8 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
         totalTokens: tokens.totalTokens,
         estimatedTokens: tokens.estimatedTokens,
         tokenBreakdown: tokens.tokenBreakdown,
+        agnoTokens: tokens.agnoTokens,
+        agnoProcessingCost: tokens.agnoProcessingCost,
         status: isCancelled && jobStatus !== 'success' ? 'failed' : jobStatus,
       });
       
@@ -470,6 +575,7 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
     isProcessingQueue,
     thinkingEnabled, setThinkingEnabled,
     thinkingDetailLevel, setThinkingDetailLevel,
+    useAgnoProcessing, setUseAgnoProcessing,
     progress, currentTask,
     processedFilesCount, failedFilesCount, totalFilesToProcess,
     currentFileProcessing, currentThinkingStream,
@@ -482,7 +588,8 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
     jobQueue, jobResults, clearJobResults,
     isProcessingQueue,
     thinkingEnabled, 
-    thinkingDetailLevel, 
+    thinkingDetailLevel,
+    useAgnoProcessing,
     progress, currentTask,
     processedFilesCount, failedFilesCount, totalFilesToProcess,
     currentFileProcessing, currentThinkingStream,

@@ -1,0 +1,66 @@
+---
+title: Agent Monitoring
+description: Track and monitor your Agno agents in real-time.
+---
+
+## Monitor Your Agents
+
+You can track your agents sessions and performance to ensure everything is working as expected. Agno provides built-in monitoring that you can access at [app.agno.com](https://app.agno.com).
+
+## Authenticate & Enable Monitoring
+
+<Steps>
+<Step title="Authenticate using CLI or API key">
+
+
+To log agent sessions, you need to authenticate using one of these methods:
+
+**Method A: Log in using your command line interface**
+```bash
+ag setup
+```
+
+**Method B: Log using an API key**
+
+Get your API key from [Agno App](https://app.agno.com/settings) and use it to log agent sessions to your workspace.
+
+```bash
+export AGNO_API_KEY=your_api_key_here
+```
+</Step>
+
+<Step title="Enable Monitoring">
+
+After authentication, enable monitoring for a particular agent or globally for all agents.
+
+**Method A: For a Specific Agent**
+```python
+agent = Agent(markdown=True, monitoring=True)
+```
+
+**Method B: Globally via Environment Variable**
+```bash
+export AGNO_MONITOR=true
+```
+</Step>
+
+<Step title="Track Your Agent Sessions">
+
+Once monitoring is enabled, you can run your agent and view its session data:
+
+1. Create a file `monitoring.py` with this sample code:
+   ```python monitoring.py
+   from agno.agent import Agent
+
+   agent = Agent(markdown=True, monitoring=True)
+   agent.print_response("Share a 2 sentence horror story")
+   ```
+
+2. Run your code locally
+3. View your sessions at [app.agno.com/sessions](https://app.agno.com/sessions)
+
+<img height="200" src="/images/monitoring.png" style={{ borderRadius: "8px" }} />
+</Step>
+</Steps>
+<Info>Facing issues? Check out our [troubleshooting guide](/faq/cli-auth)</Info>
+

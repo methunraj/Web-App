@@ -1,0 +1,62 @@
+---
+title: xAI
+description: Learn how to use xAI with Agno.
+---
+
+xAI is a platform for providing endpoints for Large Language models.
+See their list of models [here](https://docs.x.ai/docs/models).
+
+We recommend experimenting to find the best-suited model for your use-case. `grok-beta` model is good for most use-cases.
+
+xAI has rate limits on their APIs. See the [docs](https://docs.x.ai/docs/usage-tiers-and-rate-limits) for more information.
+
+## Authentication
+
+Set your `XAI_API_KEY` environment variable. You can get one [from xAI here](https://console.x.ai/).
+
+<CodeGroup>
+
+```bash Mac
+export XAI_API_KEY=sk-***
+```
+
+```bash Windows
+setx XAI_API_KEY sk-***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `xAI` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+
+from agno.agent import Agent, RunResponse
+from agno.models.xai import xAI
+
+agent = Agent(
+    model=xAI(id="grok-beta"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> View more examples [here](../examples/models/xai). </Note>
+
+## Params
+
+For more information, please refer to the [xAI docs](https://docs.x.ai/docs) as well.
+
+## Params
+
+<Snippet file="model-xai-params.mdx" />
+
+`xAI` also supports the params of [OpenAI](/reference/models/openai).

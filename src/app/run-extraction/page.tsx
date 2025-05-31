@@ -170,6 +170,7 @@ export default function RunExtractionPage() {
     currentFileProcessing, currentThinkingStream,
     startProcessingJobQueue, cancelProcessingJobQueue,
     clearJobResults,
+    useAgnoProcessing, setUseAgnoProcessing,
     useCaching, setUseCaching,
     cacheStats,
     cachePricePerMillionTokens, setCachePricePerMillionTokens,
@@ -178,7 +179,8 @@ export default function RunExtractionPage() {
   const { toast } = useToast();
 
   const [showResultsSection, setShowResultsSection] = useState(false);
-  const [maxRetries, setMaxRetries] = useState<number>(2); 
+  const [maxRetries, setMaxRetries] = useState<number>(2);
+  // Remove local useAgnoProcessing state - now using from JobContext 
 
   useEffect(() => {
     if (jobResults.length > 0 && !isProcessingQueue) {
@@ -215,6 +217,7 @@ export default function RunExtractionPage() {
     console.log("Max Retries:", maxRetries);
     console.log("Thinking Enabled:", thinkingEnabled);
     console.log("Thinking Detail Level:", thinkingDetailLevel);
+    console.log("Agno Processing Enabled:", useAgnoProcessing);
     console.log("Schema Length:", schemaJson.length);
     console.log("System Prompt Length:", systemPrompt.length);
     console.log("User Prompt Length:", userPromptTemplate.length);
@@ -241,7 +244,8 @@ export default function RunExtractionPage() {
       model, 
       apiKey,
       numericThinkingBudget,
-      temperature
+      temperature,
+      useAgnoProcessing
     );
   };
 
@@ -327,6 +331,10 @@ export default function RunExtractionPage() {
               <div className="flex items-center space-x-2">
                 <Switch id="thinking-enabled" checked={thinkingEnabled} onCheckedChange={setThinkingEnabled} disabled={isProcessingQueue} aria-label="Enable AI Thinking Visualization"/>
                 <Label htmlFor="thinking-enabled">Enable AI Thinking Visualization</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch id="agno-processing" checked={useAgnoProcessing} onCheckedChange={setUseAgnoProcessing} disabled={isProcessingQueue} aria-label="Enable Agno AI Processing"/>
+                <Label htmlFor="agno-processing">Transform Data with Agno AI</Label>
               </div>
               {thinkingEnabled && (
                 <div className="w-full sm:w-auto">

@@ -108,6 +108,13 @@ const extractionPrompt = ai.definePrompt({
   output: { schema: z.object({ extractedJson: z.string() }) }, 
   prompt: `{{{system_prompt_text}}}
 
+You are an expert at extracting structured data and MUST always output valid JSON that strictly follows the provided schema. Remember:
+- ALL property names must be in double quotes
+- ALL string values must be in double quotes
+- Use proper JSON syntax, not JavaScript object notation
+- Numbers and booleans should NOT be quoted
+- null values should be written as null (not "null")
+
 User Task: {{{user_task_text}}}
 
 Document to process:
@@ -135,9 +142,39 @@ Expected JSON Output:
 {{/if}}
 
 Based on the user task, document, and JSON schema, extract the relevant information.
-Return ONLY the valid JSON output that conforms to the schema. Do not include any other text, explanations, or markdown code fences around the JSON.`,
+Return ONLY the valid JSON output that conforms to the schema. Do not include any other text, explanations, or markdown code fences around the JSON.
+
+CRITICAL: Output ONLY the JSON object. Do NOT include:
+- Any text before the JSON
+- Any text after the JSON
+- Markdown code blocks (\`\`\`json)
+- Additional JSON objects
+- Explanations or comments
+
+The response must start with { and end with } and contain nothing else.
+
+IMPORTANT JSON FORMATTING RULES:
+1. ALL property names MUST be enclosed in double quotes ("propertyName")
+2. ALL string values MUST be enclosed in double quotes ("value")
+3. Use proper JSON syntax: {"key": "value"} NOT {key: value}
+4. Ensure all string values are properly escaped:
+   - Replace newlines within strings with \\n
+   - Replace quotes within strings with \\"
+   - Replace backslashes with \\\\
+5. Do not include actual line breaks or tabs inside string values
+6. Numbers and booleans should NOT be quoted
+7. null values should be written as null (not "null")
+8. Arrays use square brackets: ["item1", "item2"]
+9. Objects use curly braces: {"key": "value"}
+10. Ensure the JSON is valid and can be parsed without errors
+
+EXAMPLE OF CORRECT JSON:
+{"name": "Company Name", "revenue": 12345, "isActive": true, "data": null}
+
+EXAMPLE OF INCORRECT JSON:
+{name: "Company Name", revenue: "12345", isActive: "true", data: "null"}`,
   config: { 
-    temperature: 0.2, 
+    temperature: 0.1,  // Lower temperature for more consistent JSON output
     safetySettings: [ 
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
@@ -168,10 +205,16 @@ const extractDataFlow = ai.defineFlow(
       callConfig.temperature = input.temperature;
     }
     
+    // Configure the call options with appropriate parameters
     if (input.llmProvider === 'googleAI' && input.numericThinkingBudget !== undefined) {
         callConfig.thinkingConfig = { 
             thinkingBudget: input.numericThinkingBudget 
         };
+    }
+    
+    // Add response mime type for JSON to encourage proper formatting
+    if (input.llmProvider === 'googleAI') {
+        callConfig.responseMimeType = 'application/json';
     }
     
     let modelToUse: string | undefined = undefined;
@@ -390,11 +433,78 @@ const extractDataFlow = ai.defineFlow(
     let finalJson = output.extractedJson;
     finalJson = finalJson.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
     
+    // Clean up common JSON issues
+    // Remove any control characters within string values
+    finalJson = finalJson
+      // First, temporarily replace valid escaped characters with placeholders
+      .replace(/\\"/g, '\u0001')
+      .replace(/\\\\/g, '\u0002')
+      .replace(/\\n/g, '\u0003')
+      .replace(/\\r/g, '\u0004')
+      .replace(/\\t/g, '\u0005')
+      .replace(/\\b/g, '\u0006')
+      .replace(/\\f/g, '\u0007')
+      // Now remove any actual control characters
+      .replace(/[\x00-\x1F\x7F]/g, ' ')
+      // Restore the valid escaped characters
+      .replace(/\u0001/g, '\\"')
+      .replace(/\u0002/g, '\\\\')
+      .replace(/\u0003/g, '\\n')
+      .replace(/\u0004/g, '\\r')
+      .replace(/\u0005/g, '\\t')
+      .replace(/\u0006/g, '\\b')
+      .replace(/\u0007/g, '\\f');
+    
+    // Try to fix common JSON syntax errors
+    // Fix unquoted property names (e.g., {name: "value"} -> {"name": "value"})
+    finalJson = finalJson.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*:)/g, '$1"$2"$3');
+    
+    // Fix single quotes to double quotes
+    finalJson = finalJson.replace(/'/g, '"');
+    
     try {
       JSON.parse(finalJson);
     } catch (e) {
        console.error("LLM output is not valid JSON after attempting cleanup:", output.extractedJson);
-       throw new Error(`Extraction failed: LLM output is not valid JSON. Error: ${(e as Error).message}. Cleaned Output: ${finalJson}`);
+       console.error("Cleaned output:", finalJson);
+       console.error("Parse error:", e);
+       
+       // Try more aggressive cleanup
+       try {
+         // Fix missing quotes around property names more aggressively
+         finalJson = finalJson
+           // Fix object property names
+           .replace(/([{,]\s*)([^"\s:]+)(\s*:)/g, (match, prefix, prop, suffix) => {
+             // Don't quote if it's already quoted or if it's a number/boolean/null
+             if (prop.startsWith('"') || /^(true|false|null|-?\d+(\.\d+)?)$/.test(prop)) {
+               return match;
+             }
+             return `${prefix}"${prop}"${suffix}`;
+           })
+           // Fix trailing commas
+           .replace(/,\s*([}\]])/g, '$1')
+           // Fix multiple commas
+           .replace(/,\s*,/g, ',')
+           // Ensure proper spacing after colons
+           .replace(/"\s*:\s*/g, '": ');
+         
+         JSON.parse(finalJson);
+         console.log("Successfully cleaned JSON with aggressive property name fixing");
+       } catch (secondError) {
+         // Last resort: try to extract valid JSON portion
+         const jsonMatch = finalJson.match(/{[\s\S]*}/m);
+         if (jsonMatch) {
+           try {
+             JSON.parse(jsonMatch[0]);
+             finalJson = jsonMatch[0];
+             console.log("Extracted valid JSON portion from output");
+           } catch (thirdError) {
+             throw new Error(`Extraction failed: LLM output is not valid JSON. Error: ${(e as Error).message}. Cleaned Output: ${finalJson.substring(0, 500)}...`);
+           }
+         } else {
+           throw new Error(`Extraction failed: LLM output is not valid JSON. Error: ${(e as Error).message}. Cleaned Output: ${finalJson.substring(0, 500)}...`);
+         }
+       }
     }
     
     return { 

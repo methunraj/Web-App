@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+agno
+google-genai
+google-generativeai
+pydantic
